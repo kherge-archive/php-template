@@ -1,6 +1,8 @@
 Template
 ========
 
+[![Build Status](https://travis-ci.org/herrera-io/php-template.png)](http://travis-ci.org/herrera-io/php-template)
+
 A simple templating engine using regular PHP files.
 
 Usage
