@@ -1,0 +1,60 @@
+{
+    "hash": "c7c2042c6b996cd99c2f49556553f6da",
+    "packages": [
+        {
+            "name": "herrera-io/file-locator",
+            "version": "1.0.0",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/herrera-io/php-file-locator.git",
+                "reference": "1.0.0"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://github.com/herrera-io/php-file-locator/archive/1.0.0.zip",
+                "reference": "1.0.0",
+                "shasum": ""
+            },
+            "require": {
+                "php": ">=5.3.3"
+            },
+            "time": "2013-01-16 19:23:05",
+            "type": "library",
+            "extra": {
+                "branch-alias": {
+                    "dev-master": "1.0-dev"
+                }
+            },
+            "autoload": {
+                "psr-0": {
+                    "Herrera\\FileLocator": "src/lib"
+                }
+            },
+            "notification-url": "http://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Kevin Herrera",
+                    "email": "kevin@herrera.io",
+                    "homepage": "http://kevin.herrera.io"
+                }
+            ],
+            "description": "A simple file locator library.",
+            "homepage": "https://herrera-io.github.com/php-file-locator",
+            "keywords": [
+                "file",
+                "locator"
+            ]
+        }
+    ],
+    "packages-dev": null,
+    "aliases": [
+
+    ],
+    "minimum-stability": "stable",
+    "stability-flags": [
+
+    ]
+}

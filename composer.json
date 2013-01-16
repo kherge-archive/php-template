@@ -1,0 +1,34 @@
+{
+    "name": "herrera-io/template",
+    "description": "A simple templating engine using regular PHP files.",
+    "keywords": ["templating"],
+    "homepage": "https://code.herrera.io/php-template",
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "Kevin Herrera",
+            "email": "kevin@herrera.io",
+            "homepage": "http://kevin.herrera.io"
+        }
+    ],
+    "support": {
+        "issues": "https://github.com/herrera-io/php-template/issues"
+    },
+    "require": {
+        "php": ">=5.3.3",
+        "herrera-io/file-locator": "1.*"
+    },
+    "autoload": {
+        "psr-0": {
+            "Herrera\\Template": "src/lib"
+        }
+    },
+    "config": {
+        "vendor-dir": "src/vendors"
+    },
+    "extra": {
+        "branch-alias": {
+            "dev-master": "1.0-dev"
+        }
+    }
+}
