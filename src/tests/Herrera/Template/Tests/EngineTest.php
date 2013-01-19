@@ -5,6 +5,7 @@ namespace Herrera\Template\Tests;
 use Herrera\Template\Engine;
 use Herrera\FileLocator\Locator\FileSystemLocator;
 use PHPUnit_Framework_TestCase as TestCase;
+use ReflectionProperty;
 
 class EngineTest extends TestCase
 {
@@ -19,6 +20,24 @@ class EngineTest extends TestCase
             'Herrera\\FileLocator\\Collection',
             $this->engine->getLocator()
         );
+    }
+
+    public function testCreate()
+    {
+        $engine = Engine::create(__DIR__);
+        $collection = $engine->getLocator();
+
+        $locators = new ReflectionProperty($collection, 'locators');
+        $locators->setAccessible(true);
+
+        $locators = $locators->getValue($collection);
+
+        foreach ($locators as $locator) {
+            $this->assertInstanceOf(
+                'Herrera\\FileLocator\\Locator\\FileSystemLocator',
+                $locator
+            );
+        }
     }
 
     public function testGet()
