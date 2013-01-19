@@ -3,6 +3,7 @@
 namespace Herrera\Template;
 
 use Herrera\FileLocator\Collection;
+use Herrera\FileLocator\Locator\FileSystemLocator;
 use Herrera\FileLocator\Locator\LocatorInterface;
 use Herrera\Template\Exception\InvalidArgumentException;
 
@@ -32,6 +33,21 @@ class Engine
         }
 
         $this->locator = $locator;
+    }
+
+    /**
+     * Creates a new instance for the directory path(s).
+     *
+     * @param array|string The directory path(s).
+     *
+     * @return Engine The new instance.
+     */
+    public static function create($path)
+    {
+        $engine = new self();
+        $engine->getLocator()->add(new FileSystemLocator($path));
+
+        return $engine;
     }
 
     /**
