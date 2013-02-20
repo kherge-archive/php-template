@@ -2,7 +2,7 @@
     "name": "herrera-io/template",
     "description": "A simple templating engine using regular PHP files.",
     "keywords": ["templating"],
-    "homepage": "https://code.herrera.io/php-template",
+    "homepage": "http://code.herrera.io/php-template",
     "license": "MIT",
     "authors": [
         {
