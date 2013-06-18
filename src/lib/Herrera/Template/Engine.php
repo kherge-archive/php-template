@@ -87,10 +87,12 @@ class Engine
     public function render($template, array $vars = array(), $buffer = false)
     {
         if (null === ($path = $this->locator->locate($template))) {
-            throw new InvalidArgumentException(sprintf(
-                'The template "%s" does not exist.',
-                $template
-            ));
+            throw new InvalidArgumentException(
+                sprintf(
+                    'The template "%s" does not exist.',
+                    $template
+                )
+            );
         }
 
         if ($buffer) {
@@ -125,6 +127,8 @@ class Engine
      */
     private function renderInScope($__file__, $tpl)
     {
+        extract($tpl, EXTR_SKIP);
+
         include $__file__;
     }
 }

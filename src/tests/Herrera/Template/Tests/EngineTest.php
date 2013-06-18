@@ -69,8 +69,9 @@ class EngineTest extends TestCase
 
     public function testRender()
     {
-        $this->assertEquals(trim(
-            <<<RENDER
+        $this->assertEquals(
+            trim(
+                <<<RENDER
 <ul>
   <li>1</li>
   <li>two</li>
@@ -79,12 +80,39 @@ class EngineTest extends TestCase
 </ul>
 RENDER
             ),
-            $this->engine->render(
-                'list.php',
-                array(
-                    'items' => array(1, 'two', 3, 'four')
-                ),
-                true
+            trim(
+                $this->engine->render(
+                    'list.php',
+                    array(
+                        'items' => array(1, 'two', 3, 'four')
+                    ),
+                    true
+                )
+            )
+        );
+    }
+
+    public function testRenderExtract()
+    {
+        $this->assertEquals(
+            trim(
+                <<<RENDER
+<ul>
+  <li>1</li>
+  <li>two</li>
+  <li>3</li>
+  <li>four</li>
+</ul>
+RENDER
+            ),
+            trim(
+                $this->engine->render(
+                    'extract.php',
+                    array(
+                        'items' => array(1, 'two', 3, 'four')
+                    ),
+                    true
+                )
             )
         );
     }
@@ -101,8 +129,10 @@ RENDER
     protected function setUp()
     {
         $this->engine = new Engine();
-        $this->engine->getLocator()->add(new FileSystemLocator(
-            __DIR__ . '/../../../../../res/templates'
-        ));
+        $this->engine->getLocator()->add(
+            new FileSystemLocator(
+                __DIR__ . '/../../../../../res/templates'
+            )
+        );
     }
 }
