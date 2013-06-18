@@ -2,107 +2,197 @@
 
 namespace Herrera\Template\Tests;
 
-use Herrera\Template\Engine;
 use Herrera\FileLocator\Locator\FileSystemLocator;
-use PHPUnit_Framework_TestCase as TestCase;
-use ReflectionProperty;
+use Herrera\PHPUnit\TestCase;
+use Herrera\Template\Engine;
 
 class EngineTest extends TestCase
 {
+    private $cwd;
+    private $dir;
+
     /**
      * @var Engine
      */
     private $engine;
 
-    public function testDefaultLocator()
+    public function testConstructDefault()
     {
         $this->assertInstanceOf(
-            'Herrera\\FileLocator\\Collection',
-            $this->engine->getLocator()
+            'Herrera\\FileLocator\\Locator\\LocatorInterface',
+            $this->getPropertyValue($this->engine, 'locator')
+        );
+    }
+
+    public function testConstructAlt()
+    {
+        $locator = new FileSystemLocator(array());
+
+        $engine = new Engine($locator);
+
+        $this->assertSame(
+            $locator,
+            $this->getPropertyValue($engine, 'locator')
         );
     }
 
     public function testCreate()
     {
         $engine = Engine::create(__DIR__);
-        $collection = $engine->getLocator();
 
-        $locators = new ReflectionProperty($collection, 'locators');
-        $locators->setAccessible(true);
+        $this->assertInstanceOf(
+            'Herrera\\Template\\Engine',
+            $engine
+        );
 
-        $locators = $locators->getValue($collection);
+        $locators = $this->getPropertyValue($engine, 'locator');
 
-        foreach ($locators as $locator) {
-            $this->assertInstanceOf(
-                'Herrera\\FileLocator\\Locator\\FileSystemLocator',
-                $locator
-            );
-        }
+        /** @var $locators \SplObjectStorage */
+        $locators = $this->getPropertyValue($locators, 'locators');
+
+        $locators->rewind();
+
+        $this->assertEquals(
+            array(__DIR__),
+            $this->getPropertyValue($locators->current(), 'directories')
+        );
     }
 
-    public function testGet()
+    public function testDisplay()
     {
-        $this->assertSame(456, Engine::get($var, 456));
+        $this->setPropertyValue(
+            $this->engine,
+            'locator',
+            $this->getLocator()
+        );
 
-        $var = 123;
+        file_put_contents(
+            'test.php',
+            <<<TEMPLATE
+<?php echo \$var['title']; ?>:
+<ul>
+<?php foreach (\$var['items'] as \$item): ?>
+  <li><?php echo \$item; ?></li>
+<?php endforeach; ?>
+</ul>
+TEMPLATE
+        );
 
-        $this->assertSame(123, Engine::get($var, 456));
+        $this->expectOutputString(
+            <<<OUTPUT
+Example List:
+<ul>
+  <li>alpha</li>
+  <li>beta</li>
+  <li>gamma</li>
+</ul>
+OUTPUT
+        );
+
+        $this->engine['title'] = 'Example List';
+
+        $this->engine->display(
+            'test.php',
+            array('items' => array('alpha', 'beta', 'gamma'))
+        );
+    }
+
+    public function testDisplayException()
+    {
+        $this->setExpectedException(
+            'Herrera\\Template\\Exception\\TemplateNotFoundException',
+            'The template "test.php" does not exist.'
+        );
+
+        $this->engine->display('test.php');
     }
 
     public function testGetLocator()
     {
         $this->assertInstanceOf(
             'Herrera\\FileLocator\\Locator\\LocatorInterface',
-            $this->engine->getLocator()
+            $this->getLocator()
         );
-    }
-
-    public function testRenderNotExist()
-    {
-        $this->setExpectedException(
-            'Herrera\\Template\\Exception\\InvalidArgumentException',
-            'The template "test" does not exist.'
-        );
-
-        $this->engine->render('test');
     }
 
     public function testRender()
     {
-        $this->assertEquals(trim(
-            <<<RENDER
+        $this->setPropertyValue(
+            $this->engine,
+            'locator',
+            $this->getLocator()
+        );
+
+        file_put_contents(
+            'test.php',
+            <<<TEMPLATE
+<?php echo \$var['title']; ?>:
 <ul>
-  <li>1</li>
-  <li>two</li>
-  <li>3</li>
-  <li>four</li>
+<?php foreach (\$var['items'] as \$item): ?>
+  <li><?php echo \$item; ?></li>
+<?php endforeach; ?>
 </ul>
-RENDER
-            ),
+TEMPLATE
+        );
+
+        $this->engine['title'] = 'Example List';
+
+        $this->assertEquals(
+            <<<OUTPUT
+Example List:
+<ul>
+  <li>alpha</li>
+  <li>beta</li>
+  <li>gamma</li>
+</ul>
+OUTPUT
+            ,
             $this->engine->render(
-                'list.php',
-                array(
-                    'items' => array(1, 'two', 3, 'four')
-                ),
-                true
+                'test.php',
+                array('items' => array('alpha', 'beta', 'gamma'))
             )
         );
     }
 
+    public function testRenderException()
+    {
+        $this->setExpectedException(
+            'Herrera\\Template\\Exception\\TemplateNotFoundException',
+            'The template "test.php" does not exist.'
+        );
+
+        $this->engine->render('test.php');
+    }
+
     public function testSetLocator()
     {
-        $locator = new FileSystemLocator(null);
+        $locator = $this->getLocator();
 
         $this->engine->setLocator($locator);
 
-        $this->assertSame($locator, $this->engine->getLocator());
+        $this->assertSame(
+            $locator,
+            $this->getPropertyValue($this->engine, 'locator')
+        );
+    }
+
+    protected function getLocator()
+    {
+        return new FileSystemLocator(array($this->dir));
     }
 
     protected function setUp()
     {
+        $this->cwd = getcwd();
+        $this->dir = $this->createDir();
+
+        chdir($this->dir);
+
         $this->engine = new Engine();
-        $this->engine->getLocator()->add(new FileSystemLocator(
-            __DIR__ . '/../../../../../res/templates'
-        ));
+    }
+
+    protected function tearDown()
+    {
+        chdir($this->cwd);
     }
 }

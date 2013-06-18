@@ -2,17 +2,19 @@
 
 namespace Herrera\Template;
 
+use ArrayObject;
+use Exception;
 use Herrera\FileLocator\Collection;
 use Herrera\FileLocator\Locator\FileSystemLocator;
 use Herrera\FileLocator\Locator\LocatorInterface;
-use Herrera\Template\Exception\InvalidArgumentException;
+use Herrera\Template\Exception\TemplateNotFoundException;
 
 /**
  * Renders content using regular PHP scripts.
  *
  * @author Kevin Herrera <kevin@herrera.io>
  */
-class Engine
+class Engine extends ArrayObject
 {
     /**
      * The template file locator.
@@ -45,22 +47,36 @@ class Engine
     public static function create($path)
     {
         $engine = new self();
-        $engine->getLocator()->add(new FileSystemLocator($path));
+
+        /** @var $locator Collection*/
+        $locator = $engine->getLocator();
+
+        $locator->add(new FileSystemLocator($path));
 
         return $engine;
     }
 
     /**
-     * Returns the variable, or the default value if not set.
+     * Renders a template and displays the result.
      *
-     * @param mixed $var     The variable.
-     * @param mixed $default The default value.
+     * @param string  $template The name of the template.
+     * @param array   $vars     The template variables.
      *
-     * @return mixed The variable or default value.
+     * @throws TemplateNotFoundException If the template does not exist.
      */
-    public static function get(&$var, $default)
+    public function display($template, array $vars = array())
     {
-        return isset($var) ? $var : $default;
+        if (null === ($path = $this->locator->locate($template))) {
+            throw TemplateNotFoundException::format(
+                'The template "%s" does not exist.',
+                $template
+            );
+        }
+
+        $this->renderInScope(
+            $path,
+            array_replace($this->getArrayCopy(), $vars)
+        );
     }
 
     /**
@@ -74,38 +90,27 @@ class Engine
     }
 
     /**
-     * Renders and displays the template.
+     * Renders a template and returns the result.
      *
      * @param string  $template The name of the template.
      * @param array   $vars     The template variables.
-     * @param boolean $buffer   Buffer and return the result?
      *
      * @return string The template rendering.
-     *
-     * @throws InvalidArgumentException If the template does not exist.
      */
-    public function render($template, array $vars = array(), $buffer = false)
+    public function render($template, array $vars = array())
     {
-        if (null === ($path = $this->locator->locate($template))) {
-            throw new InvalidArgumentException(sprintf(
-                'The template "%s" does not exist.',
-                $template
-            ));
+        ob_start();
+
+        try {
+            $this->display($template, $vars);
+        } catch (Exception $exception) {
+            ob_end_clean();
+
+            throw $exception;
         }
 
-        if ($buffer) {
-            ob_start();
-        }
-
-        $this->renderInScope($path, $vars);
-
-        if ($buffer) {
-            return ob_get_clean();
-        }
-
-        // @codeCoverageIgnoreStart
+        return ob_get_clean();
     }
-    // @codeCoverageIgnoreStop
 
     /**
      * Sets the template file locator.
@@ -121,10 +126,12 @@ class Engine
      * Renders the template in its own scope.
      *
      * @param string $__file__ The template file path.
-     * @param array  $tpl      The template variables.
+     * @param array  $var      The template variables.
      */
-    private function renderInScope($__file__, $tpl)
+    private function renderInScope($__file__, $var)
     {
+        extract($var, EXTR_SKIP);
+
         include $__file__;
     }
 }
