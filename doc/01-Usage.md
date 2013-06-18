@@ -100,10 +100,10 @@ Locators
 --------
 
 The templating engine makes use of the Herrera.io [`FileLocator`][] library.
-By default, the `Herrera\\FileLocator\\Collection` locator is used with the
-`Herrera\\FileLocator\\Locator\\FileSystemLocator` locator. This is set for
-you when you provide the path to `Engine::__construct()`. If you wish to
-retrieve the locator, you may call `$engine->getLocator()`. You may also
-replace the locator by calling `$engine->setLocator($myLocator)`.
+By default, the `Herrera\FileLocator\Collection` locator is used with the
+`Herrera\FileLocator\Locator\FileSystemLocator` locator. This is set for you
+when you provide the path to `Engine::__construct()`. If you wish to retrieve
+the locator, you may call `$engine->getLocator()`. You may also replace the
+locator by calling `$engine->setLocator($myLocator)`.
 
 [`FileLocator`]: https://github.com/herrera-io/php-file-locator
