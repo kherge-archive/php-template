@@ -18,12 +18,17 @@
         "php": ">=5.3.3",
         "herrera-io/file-locator": "1.*"
     },
+    "require-dev": {
+        "herrera-io/phpunit-test-case": "~1.0",
+        "phpunit/phpunit": "~3.7"
+    },
     "autoload": {
         "psr-0": {
             "Herrera\\Template": "src/lib"
         }
     },
     "config": {
+        "bin-dir": "bin",
         "vendor-dir": "src/vendors"
     },
     "extra": {
