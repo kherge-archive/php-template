@@ -45,7 +45,7 @@ With templates, you can assign variables that will be made available for
 rendering content. The following template:
 
 ```php
-<p>My <?= $thing ?>!</p>
+<p>My <?php echo $thing; ?>!</p>
 ```
 
 with the following script:
